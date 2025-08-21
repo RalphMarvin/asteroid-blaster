@@ -1,10 +1,10 @@
 // --- AUDIO FILE URLS ---
 // Using URLs from reliable CDNs with correct CORS headers to prevent loading errors.
 
-const laserSoundSrc = 'https://cdn.freesound.org/previews/27/27568_32267-lq.mp3';
-const explosionSoundSrc = 'https://cdn.freesound.org/previews/51/51485_40915-lq.mp3';
-const gameOverSoundSrc = 'https://cdn.freesound.org/previews/45/45696_40915-lq.mp3';
-const backgroundMusicSrc = 'https://cdn.pixabay.com/audio/2022/10/11/audio_62f1c84b90.mp3';
+const laserSoundSrc = 'sounds/laser.mp3';
+const explosionSoundSrc = 'sounds/explosion.wav';
+const gameOverSoundSrc = 'sounds/game-over.wav';
+const backgroundMusicSrc = 'sounds/background-music.mp3';
 
 let laserAudio: HTMLAudioElement;
 let explosionAudio: HTMLAudioElement;
@@ -24,18 +24,37 @@ const soundManager = {
     isInitialized: false,
 
     init() {
-        if (this.isInitialized) return;
-        try {
-            laserAudio = new Audio(laserSoundSrc);
-            explosionAudio = new Audio(explosionSoundSrc);
-            gameOverAudio = new Audio(gameOverSoundSrc);
-            musicAudio = new Audio(backgroundMusicSrc);
-            musicAudio.loop = true;
-            musicAudio.volume = 0.3; // Background music should be quieter
-            this.isInitialized = true;
-        } catch (e) {
-            console.error("Failed to initialize audio elements:", e);
-        }
+            if (this.isInitialized) return;
+            try {
+                laserAudio = new Audio(laserSoundSrc);
+                explosionAudio = new Audio(explosionSoundSrc);
+                gameOverAudio = new Audio(gameOverSoundSrc);
+                musicAudio = new Audio(backgroundMusicSrc);
+                musicAudio.loop = true;
+                musicAudio.volume = 0.3; // Background music should be quieter
+
+                // Preload audio files
+                laserAudio.preload = 'auto';
+                explosionAudio.preload = 'auto';
+                gameOverAudio.preload = 'auto';
+                musicAudio.preload = 'auto';
+                laserAudio.load();
+                explosionAudio.load();
+                gameOverAudio.load();
+                musicAudio.load();
+
+                // Add error listeners for debugging
+                [laserAudio, explosionAudio, gameOverAudio, musicAudio].forEach((audio, i) => {
+                    audio.addEventListener('error', (e) => {
+                        const names = ['Laser', 'Explosion', 'GameOver', 'Music'];
+                        console.error(`Audio error for ${names[i]}:`, e);
+                    });
+                });
+
+                this.isInitialized = true;
+            } catch (e) {
+                console.error("Failed to initialize audio elements:", e);
+            }
     },
 
     playLaser() {
