@@ -42,15 +42,33 @@ export const GameScreen: React.FC<GameScreenProps> = ({ children }) => (
   </div>
 );
 
-export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStart }) => (
+export const WelcomeScreen: React.FC<WelcomeScreenProps & {
+    onCustomize?: () => void;
+    muted?: boolean;
+    onToggleMute?: () => void;
+}> = ({ onStart, onCustomize, muted, onToggleMute }) => (
     <div className="flex flex-col items-center justify-center h-full text-center bg-black/50 p-8">
         <p className="mb-8 text-lg text-gray-300 max-w-sm">Use [Arrow Keys] to move and [Spacebar] to shoot.</p>
-        <button
-            onClick={onStart}
-            className="px-8 py-4 bg-cyan-500 text-black font-bold text-2xl rounded-md transition-transform transform hover:scale-110 hover:bg-cyan-400 shadow-lg shadow-cyan-500/50 animate-pulse"
-        >
-            START GAME
-        </button>
+        <div className="flex flex-col space-y-4 w-full max-w-xs">
+            <button
+                onClick={onStart}
+                className="px-8 py-4 bg-cyan-500 text-black font-bold text-2xl rounded-md transition-transform transform hover:scale-110 hover:bg-cyan-400 shadow-lg shadow-cyan-500/50 animate-pulse"
+            >
+                START GAME
+            </button>
+            <button
+                onClick={onCustomize}
+                className="px-8 py-4 bg-purple-500 text-white font-bold text-xl rounded-md transition-transform transform hover:scale-105 hover:bg-purple-400 shadow-lg shadow-purple-500/50"
+            >
+                CUSTOMIZE
+            </button>
+            <button
+                onClick={onToggleMute}
+                className={`px-8 py-4 ${muted ? 'bg-gray-400 text-gray-900' : 'bg-green-500 text-white'} font-bold text-xl rounded-md transition-transform transform hover:scale-105 shadow-lg ${muted ? 'shadow-gray-400/50' : 'shadow-green-500/50'}`}
+            >
+                {muted ? 'PLAY WITH SOUND' : 'PLAY MUTED'}
+            </button>
+        </div>
     </div>
 );
 
