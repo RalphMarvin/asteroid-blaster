@@ -5,7 +5,8 @@ export const createAsteroid = (settings: { ASTEROID_MIN_SPEED: number; ASTEROID_
   const size = Math.random() * (ASTEROID_MAX_SIZE - ASTEROID_MIN_SIZE) + ASTEROID_MIN_SIZE;
   const x = Math.random() * (GAME_WIDTH - size);
   const speed = Math.random() * (settings.ASTEROID_MAX_SPEED - settings.ASTEROID_MIN_SPEED) + settings.ASTEROID_MIN_SPEED;
-  const angle = Math.random() * 120 + 30; // 30 to 150 degrees
+  // 25% chance to drop straight down
+  const angle = Math.random() < 0.25 ? 90 : Math.random() * 120 + 30; // 30 to 150 degrees, or straight down
   const rotation = Math.random() * 360;
   const rotationSpeed = (Math.random() - 0.5) * 4;
 

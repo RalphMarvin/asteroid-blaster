@@ -17,6 +17,8 @@ const App = () => {
   });
   const [showConfetti, setShowConfetti] = useState(false);
   const [muted, setMuted] = useState(false); // Play with sound enabled by default
+  const [badge, setBadge] = useState<string | null>(null);
+  const [showBadgePopup, setShowBadgePopup] = useState(false);
   // Customization handler stub
   const handleCustomize = useCallback(() => {
     alert('Customization screen coming soon!');
@@ -48,13 +50,34 @@ const App = () => {
     setGameState('playing');
   }, []);
 
+  const getBadgeName = (score: number) => {
+    if (score >= 10000) return 'Lord of the Asteroids';
+    if (score >= 8500) return 'Galaxy Destroyer';
+    if (score >= 5000) return 'Mr Shooter';
+    if (score >= 2500) return 'The Rookie';
+    return null;
+  };
+
   const handleGameOver = useCallback((score: number) => {
     setFinalScore(score);
+    let earnedBadge = null;
     if (score > highScore) {
       setHighScore(score);
       localStorage.setItem('asteroidBlasterHighScore', score.toString());
       setShowConfetti(true);
       setTimeout(() => setShowConfetti(false), 2000);
+      earnedBadge = getBadgeName(score);
+      setBadge(earnedBadge);
+      if (earnedBadge) {
+        setShowBadgePopup(true);
+      }
+    } else {
+      // If not a new high score, show badge for current high score
+      earnedBadge = getBadgeName(highScore);
+      setBadge(earnedBadge);
+      if (earnedBadge) {
+        setShowBadgePopup(true);
+      }
     }
     setGameState('gameOver');
   }, [highScore]);
@@ -78,10 +101,13 @@ const App = () => {
   }, [gameState, audioInitialized, muted]);
 
 
+  // Compute badge for current high score
+  const currentBadge = getBadgeName(highScore);
+
   const renderGameState = () => {
     switch (gameState) {
       case 'welcome':
-        return <WelcomeScreen onStart={handleStartGame} onCustomize={handleCustomize} muted={muted} onToggleMute={handleToggleMute} />;
+        return <WelcomeScreen onStart={handleStartGame} onCustomize={handleCustomize} muted={muted} onToggleMute={handleToggleMute} badge={currentBadge} highScore={highScore} />;
       case 'selectDifficulty':
         return <DifficultyScreen onSelectDifficulty={handleSelectDifficulty} />;
       case 'playing':
@@ -104,6 +130,20 @@ const App = () => {
         {renderGameState()}
       </GameScreen>
       <Confetti trigger={showConfetti} />
+      {showBadgePopup && badge && (
+        <div className="fixed top-1/2 left-1/2 z-[9999]" style={{ transform: 'translate(-50%, -50%)' }}>
+          <div className="bg-gradient-to-br from-cyan-700 via-purple-700 to-yellow-500 border-4 border-yellow-400 rounded-xl shadow-2xl px-10 py-8 text-center animate-bounce relative">
+            <button
+              onClick={() => setShowBadgePopup(false)}
+              className="absolute top-2 right-2 px-3 py-1 bg-red-600 text-white rounded-full text-lg font-bold hover:bg-red-500 transition"
+              aria-label="Close badge popup"
+            >✕</button>
+            <div className="text-4xl font-extrabold text-yellow-300 mb-2" style={{ textShadow: '0 0 10px #fff' }}>BADGE UNLOCKED!</div>
+            <div className="text-2xl font-bold text-white mb-2">{badge}</div>
+            <div className="text-lg text-cyan-200">Congratulations, you earned a new badge!</div>
+          </div>
+        </div>
+      )}
     </main>
   );
 };
