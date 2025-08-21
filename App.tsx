@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
+import Confetti from './Confetti';
 import { GameState, Difficulty } from './types';
 import { WelcomeScreen, DifficultyScreen, GameOverScreen, GameScreen } from './components';
 import Game from './Game';
@@ -10,6 +11,28 @@ const App = () => {
   const [finalScore, setFinalScore] = useState(0);
   const [gameId, setGameId] = useState(1);
   const [audioInitialized, setAudioInitialized] = useState(false);
+  const [highScore, setHighScore] = useState<number>(() => {
+    const stored = localStorage.getItem('asteroidBlasterHighScore');
+    return stored ? parseInt(stored, 10) : 0;
+  });
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [muted, setMuted] = useState(false); // Play with sound enabled by default
+  // Customization handler stub
+  const handleCustomize = useCallback(() => {
+    alert('Customization screen coming soon!');
+  }, []);
+
+  // Mute toggle handler
+  const handleToggleMute = useCallback(() => {
+    setMuted(m => {
+      const newMuted = !m;
+      soundManager.muted = newMuted;
+      if (newMuted) {
+        soundManager.stopMusic();
+      }
+      return newMuted;
+    });
+  }, []);
 
   const handleStartGame = useCallback(() => {
     if (!audioInitialized) {
@@ -27,8 +50,14 @@ const App = () => {
 
   const handleGameOver = useCallback((score: number) => {
     setFinalScore(score);
+    if (score > highScore) {
+      setHighScore(score);
+      localStorage.setItem('asteroidBlasterHighScore', score.toString());
+      setShowConfetti(true);
+      setTimeout(() => setShowConfetti(false), 2000);
+    }
     setGameState('gameOver');
-  }, []);
+  }, [highScore]);
 
   const handlePlayAgain = useCallback(() => {
     setGameId(id => id + 1); // Reset game component with a new key
@@ -41,27 +70,27 @@ const App = () => {
 
   useEffect(() => {
     if (!audioInitialized) return;
-    if (gameState === 'playing') {
+    if (gameState === 'playing' && !muted) {
       soundManager.startMusic();
     } else {
       soundManager.stopMusic();
     }
-  }, [gameState, audioInitialized]);
+  }, [gameState, audioInitialized, muted]);
 
 
   const renderGameState = () => {
-      switch (gameState) {
-          case 'welcome':
-              return <WelcomeScreen onStart={handleStartGame} />;
-          case 'selectDifficulty':
-              return <DifficultyScreen onSelectDifficulty={handleSelectDifficulty} />;
-          case 'playing':
-              return <Game key={gameId} difficulty={difficulty} onGameOver={handleGameOver} />;
-          case 'gameOver':
-              return <GameOverScreen score={finalScore} onPlayAgain={handlePlayAgain} onMainMenu={handleMainMenu} />;
-          default:
-              return null;
-      }
+    switch (gameState) {
+      case 'welcome':
+        return <WelcomeScreen onStart={handleStartGame} onCustomize={handleCustomize} muted={muted} onToggleMute={handleToggleMute} />;
+      case 'selectDifficulty':
+        return <DifficultyScreen onSelectDifficulty={handleSelectDifficulty} />;
+      case 'playing':
+        return <Game key={gameId} difficulty={difficulty} onGameOver={handleGameOver} />;
+      case 'gameOver':
+        return <GameOverScreen score={finalScore} onPlayAgain={handlePlayAgain} onMainMenu={handleMainMenu} />;
+      default:
+        return null;
+    }
   };
 
   return (
@@ -70,9 +99,11 @@ const App = () => {
         style={{ textShadow: '0 0 10px #0ff, 0 0 20px #0ff' }}>
         ASTEROID BLASTER
       </h1>
+      <div className="text-lg text-yellow-400 font-bold mb-2">HIGH SCORE: {highScore}</div>
       <GameScreen>
         {renderGameState()}
       </GameScreen>
+      <Confetti trigger={showConfetti} />
     </main>
   );
 };
