@@ -22,6 +22,7 @@ const playSound = (audio: HTMLAudioElement) => {
 
 const soundManager = {
     isInitialized: false,
+    muted: false,
 
     init() {
             if (this.isInitialized) return;
@@ -58,19 +59,19 @@ const soundManager = {
     },
 
     playLaser() {
-        if (this.isInitialized) playSound(laserAudio);
+        if (this.isInitialized && !this.muted) playSound(laserAudio);
     },
 
     playExplosion() {
-        if (this.isInitialized) playSound(explosionAudio);
+        if (this.isInitialized && !this.muted) playSound(explosionAudio);
     },
 
     playGameOver() {
-        if (this.isInitialized) playSound(gameOverAudio);
+        if (this.isInitialized && !this.muted) playSound(gameOverAudio);
     },
 
     startMusic() {
-        if (this.isInitialized && musicAudio.paused) {
+        if (this.isInitialized && !this.muted && musicAudio.paused) {
             musicAudio.play().catch(e => console.error("Error playing music:", e));
         }
     },
