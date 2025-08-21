@@ -84,18 +84,51 @@ export const useGameLogic = (difficulty: Difficulty, onGameOver: (score: number)
       nextAsteroids.push(createAsteroid(settings));
     }
 
-    let nextLasers = lasers.map(l => ({ ...l, y: l.y - LASER_SPEED }));
-    if (keysPressed.current[' '] && laserCooldown.current <= 0) {
-        soundManager.playLaser();
-        nextLasers.push({
-            id: Date.now(),
-            x: nextSpaceshipState.x + SPACESHIP_WIDTH / 2 - LASER_WIDTH / 2,
-            y: nextSpaceshipState.y,
-            width: LASER_WIDTH,
-            height: LASER_HEIGHT,
-        });
-        laserCooldown.current = settings.LASER_COOLDOWN;
+  let nextLasers = lasers.map(l => ({ ...l, y: l.y - LASER_SPEED }));
+  // Double laser upgrade: triggers if high score >= 2000 (persists across games)
+  const highScore = typeof window !== 'undefined' ? parseInt(localStorage.getItem('asteroidBlasterHighScore') || '0', 10) : 0;
+  if (keysPressed.current[' '] && laserCooldown.current <= 0) {
+    soundManager.playLaser();
+    let laserConfigs = [];
+    // Check both current score and high score for upgrades
+    const highScore = typeof window !== 'undefined' ? parseInt(localStorage.getItem('asteroidBlasterHighScore') || '0', 10) : 0;
+    const upgradeScore = Math.max(score, highScore);
+    if (upgradeScore >= 5000) {
+      // 4 lasers: leftmost, left, right, rightmost
+      laserConfigs = [
+        -18, // leftmost
+        -6,  // left
+        6,   // right
+        18   // rightmost
+      ];
+    } else if (upgradeScore >= 3000) {
+      // 3 lasers: left, center, right
+      laserConfigs = [
+        -12, // left
+        0,   // center
+        12   // right
+      ];
+    } else if (upgradeScore >= 2000) {
+      // 2 lasers: left and right
+      laserConfigs = [
+        -10, // left
+        10   // right
+      ];
+    } else {
+      // Normal single laser
+      laserConfigs = [0];
     }
+    laserConfigs.forEach((offset, i) => {
+      nextLasers.push({
+        id: Date.now() + i,
+        x: nextSpaceshipState.x + SPACESHIP_WIDTH / 2 - LASER_WIDTH / 2 + offset,
+        y: nextSpaceshipState.y,
+        width: LASER_WIDTH,
+        height: LASER_HEIGHT,
+      });
+    });
+    laserCooldown.current = settings.LASER_COOLDOWN;
+  }
 
     // 2. Collision detection and game logic
     const hitLaserIds = new Set<number>();
