@@ -5,11 +5,13 @@ import { Spaceship, Asteroid } from './components';
 
 const Game: React.FC<GameProps> = ({ difficulty, onGameOver }) => {
     const { score, spaceship, lasers, asteroids, explosions } = useGameLogic(difficulty, onGameOver);
+    const highScore = typeof window !== 'undefined' ? parseInt(localStorage.getItem('asteroidBlasterHighScore') || '0', 10) : 0;
 
     return (
         <>
             <div className="absolute top-2 left-4 text-2xl font-bold text-white z-10" style={{ textShadow: '2px 2px 4px #000' }}>
                 SCORE: {score}
+                <span className="ml-6 text-yellow-400 text-lg">HIGH: {highScore}</span>
             </div>
 
             <div className="absolute" style={{ left: spaceship.x, top: spaceship.y, width: spaceship.width, height: spaceship.height }}>
