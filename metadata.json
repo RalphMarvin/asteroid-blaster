@@ -1,0 +1,5 @@
+{
+  "name": "Asteroid Blaster",
+  "description": "A retro-style space shooter game where you control a spaceship to destroy incoming asteroids.",
+  "requestFramePermissions": []
+}
