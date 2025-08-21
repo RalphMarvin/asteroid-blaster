@@ -55,7 +55,7 @@ npm run build
 
 ## Credits
 
-- Developed by BoldInnovations Lab
+- Developed by BOLDInnovations Lab
 - Powered by React, TypeScript, and Vite
 
 ---
