@@ -62,8 +62,10 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps & {
                 'Reach 10,000 points to unlock: Lord of the Asteroids'
             ) : highScore >= 5000 ? (
                 'Reach 8,500 points to unlock: Galaxy Destroyer'
-            ) : (
+            ) : highScore >= 2500 ? (
                 'Reach 5,000 points to unlock: Mr Shooter'
+            ) : (
+                'Reach 2,500 points to unlock: The Rookie'
             )}
         </div>
         <p className="mb-8 text-lg text-gray-300 max-w-sm">Use [Arrow Keys] to move and [Spacebar] to shoot.</p>
