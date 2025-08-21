@@ -46,8 +46,26 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps & {
     onCustomize?: () => void;
     muted?: boolean;
     onToggleMute?: () => void;
-}> = ({ onStart, onCustomize, muted, onToggleMute }) => (
+    badge?: string | null;
+    highScore: number;
+}> = ({ onStart, onCustomize, muted, onToggleMute, badge, highScore }) => (
     <div className="flex flex-col items-center justify-center h-full text-center bg-black/50 p-8">
+        {badge && (
+            <div className="mb-4 px-4 py-2 bg-yellow-500 text-black font-bold rounded-full text-sm">
+                {badge.toUpperCase()}
+            </div>
+        )}
+        <div className="text-yellow-400 font-bold text-lg mb-4">
+            {highScore >= 10000 ? (
+                '⭐ All badges unlocked! ⭐'
+            ) : highScore >= 8500 ? (
+                'Reach 10,000 points to unlock: Lord of the Asteroids'
+            ) : highScore >= 5000 ? (
+                'Reach 8,500 points to unlock: Galaxy Destroyer'
+            ) : (
+                'Reach 5,000 points to unlock: Mr Shooter'
+            )}
+        </div>
         <p className="mb-8 text-lg text-gray-300 max-w-sm">Use [Arrow Keys] to move and [Spacebar] to shoot.</p>
         <div className="flex flex-col space-y-4 w-full max-w-xs">
             <button
